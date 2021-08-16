@@ -429,9 +429,11 @@ export default class ModalDropdown extends Component {
     const { options } = this.state;
 
     return (
-      <FlatList
+           <FlatList
         {...dropdownListProps}
+        getItemLayout={(data, index) => { return {length: 33 + StyleSheet.hairlineWidth, index, offset: (33 + StyleSheet.hairlineWidth) * index} }}
         data={options}
+        ref={component => (this.flatList = component)}
         scrollEnabled={scrollEnabled}
         initialScrollIndex={saveScrollPosition ? selectedIndex : -1}
         style={styles.list}
@@ -442,6 +444,12 @@ export default class ModalDropdown extends Component {
         showsVerticalScrollIndicator={showsVerticalScrollIndicator}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
         ListHeaderComponent={this._renderSearchInput}
+        onScrollToIndexFailed={info => {
+          const wait = new Promise(resolve => setTimeout(resolve, 500));
+          wait.then(() => {
+            this.flatList.scrollToIndex({ index: info.index, animated: true });
+          });
+        }}
       />
     );
   }
